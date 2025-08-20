@@ -328,16 +328,8 @@
                 
                 init() {
                     this.loadFromStorage();
-                    this.$watch('vehiclePrice', () => this.saveToStorage());
-                    this.$watch('fees', () => this.saveToStorage());
-                    this.$watch('downPayment', () => this.saveToStorage());
-                    this.$watch('tradeIn', () => this.saveToStorage());
-                    this.$watch('fedIncentive', () => this.saveToStorage());
-                    this.$watch('provIncentive', () => this.saveToStorage());
-                    this.$watch('interestRate', () => this.saveToStorage());
-                    this.$watch('loanTerm', () => this.saveToStorage());
-                    this.$watch('desiredPayment', () => this.saveToStorage());
-                    this.$watch('reverseMode', () => this.saveToStorage());
+                    // Note: $watch is not needed with our simple reactive system
+                    // Changes will trigger updates automatically through event listeners
                 },
                 
                 // Helper functions
