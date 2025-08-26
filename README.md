@@ -1,6 +1,6 @@
 # Quebec Car Finance Calculator
 
-A comprehensive web-based car payment calculator specifically designed for Quebec, Canada, featuring accurate tax calculations, luxury tax support, dark mode, and multiple payment frequency options.
+A comprehensive web-based car payment calculator specifically designed for Quebec, Canada, featuring accurate tax calculations, luxury tax support, vehicle comparison tools, CSV export capabilities, dark mode, and multiple payment frequency options.
 
 🚗 **Live Demo:** [car.m0rk.space](https://car.m0rk.space)
 
@@ -26,18 +26,38 @@ A comprehensive web-based car payment calculator specifically designed for Quebe
 - **Real-time Results**: Instant calculations as you adjust parameters
 - **Context Awareness**: Uses all settings from the main calculator tab
 
+### 🔄 Compare Options
+- **Multi-Vehicle Comparison**: Compare multiple vehicle options side-by-side
+- **Dynamic Option Management**: Add, remove, and name different vehicle options with custom pricing
+- **Comprehensive Analysis**: Each option shows complete breakdown including taxes, fees, and financing costs
+- **Visual Comparison**: Clear comparison table showing monthly payments, total interest, and total cost of ownership
+- **Smart Validation**: Only valid options (with names and prices) are included in comparisons
+
+### 📊 CSV Export Capabilities
+- **Payment Matrix Export**: Export complete payment comparison tables with different interest rates and loan terms
+- **Vehicle Options Export**: Export detailed comparison of multiple vehicle options including:
+  - Summary comparison table with key metrics
+  - Detailed breakdown for each vehicle option
+  - Complete tax and fee calculations
+  - Loan settings and parameters
+- **Professional Formatting**: Timestamped exports with clear headers and organized data structure
+- **Automatic Downloads**: One-click download of formatted CSV files for further analysis
+
 ### 🌙 User Experience
 - **Dark Mode**: Full dark/light theme toggle with system preference detection
 - **Responsive Design**: Seamless experience across desktop, tablet, and mobile devices
 - **Data Persistence**: Automatically saves all inputs using local storage
 - **Visual Feedback**: Color-coded payment comparisons and interactive tooltips
 - **Smooth Animations**: Transitions and hover effects for enhanced UX
+- **Tabbed Interface**: Clean organization with separate tabs for different calculator modes
 
 ### 🎯 Key Highlights
 - **Quebec-Specific**: Properly handles Quebec's unique tax structure (trade-in reduces taxable amount)
 - **Luxury Vehicle Ready**: Full support for federal luxury tax calculations
 - **Comprehensive**: Includes all common fees, incentives, and deductions with flexible input system
 - **Visual Comparison**: Payment matrix with color-coded best/worst options and trend indicators
+- **Data Export**: Professional CSV export functionality for detailed analysis and record-keeping
+- **Multi-Vehicle Analysis**: Compare unlimited vehicle options with comprehensive financial breakdowns
 - **Professional UI**: Clean, modern interface with Inter font and Tailwind CSS styling
 
 ## How to Use
@@ -48,7 +68,8 @@ A comprehensive web-based car payment calculator specifically designed for Quebe
 3. Adjust interest rate and loan term using the interactive sliders
 4. View calculated payments for monthly, bi-weekly, and weekly schedules
 5. Use the payment matrix to compare different interest rates and loan terms
-6. Hover over the luxury tax info icon for calculation details
+6. Export payment matrix data to CSV for further analysis
+7. Hover over the luxury tax info icon for calculation details
 
 ### Budget Calculator
 1. Switch to the "Budget Calculator" tab
@@ -57,6 +78,22 @@ A comprehensive web-based car payment calculator specifically designed for Quebe
    - **Max Vehicle Price**: Find the most expensive vehicle you can afford
    - **Min Down Payment**: Calculate the minimum down payment needed for a specific vehicle
 4. Results update automatically based on your loan parameters from the main tab
+
+### Compare Options
+1. Switch to the "Compare Options" tab
+2. Add multiple vehicle options with custom names and prices
+3. View side-by-side comparison of monthly payments, total interest, and total cost
+4. Each option uses your current loan settings from the main calculator
+5. Export detailed comparison data to CSV including:
+   - Summary comparison table
+   - Complete financial breakdown for each vehicle
+   - All tax calculations and fees
+
+### CSV Export Features
+- **From Payment Calculator**: Export payment matrix showing different interest rates and loan terms
+- **From Compare Options**: Export comprehensive vehicle comparison with detailed breakdowns
+- **Professional Format**: Timestamped files with clear organization and formatting
+- **Complete Data**: Includes all calculations, taxes, fees, and loan parameters
 
 ## Technical Details
 

@@ -52,6 +52,100 @@
             border-radius: 50%;
             border: none;
         }
+
+        /* Custom checkbox styles */
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 16px !important;
+            height: 16px !important;
+            border: 2px solid #d1d5db;
+            border-radius: 4px !important;
+            background-color: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .dark input[type="checkbox"] {
+            border-color: #6b7280;
+            background-color: #374151;
+        }
+
+        input[type="checkbox"]:hover {
+            border-color: #3b82f6;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6;
+        }
+
+        input[type="checkbox"]:checked::before {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        input[type="checkbox"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Custom radio button styles */
+        input[type="radio"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 16px !important;
+            height: 16px !important;
+            border: 2px solid #d1d5db;
+            border-radius: 50% !important;
+            background-color: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .dark input[type="radio"] {
+            border-color: #6b7280;
+            background-color: #374151;
+        }
+
+        input[type="radio"]:hover {
+            border-color: #3b82f6;
+        }
+
+        input[type="radio"]:checked {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6;
+        }
+
+        input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        input[type="radio"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         /* Style for placeholder text */
         ::placeholder {
             color: #9ca3af;
@@ -107,6 +201,9 @@
                 <button @click="activeTab = 'budget'"
                         :class="activeTab === 'budget' ? 'tab-active' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'"
                         class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200">Budget Calculator</button>
+                <button @click="activeTab = 'compare'"
+                        :class="activeTab === 'compare' ? 'tab-active' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'"
+                        class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200">Compare Options</button>
             </nav>
         </div>
 
@@ -205,7 +302,9 @@
                 <div class="lg:col-span-3">
                     <!-- Payment Schedule -->
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 transition-colors duration-200">
-                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">2. Estimated Payment Schedule</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">2. Estimated Payment Schedule</h2>
+                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors duration-200">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Monthly</p>
@@ -255,6 +354,16 @@
                             <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-3"><span class="text-gray-600 dark:text-gray-400">Total Price with Taxes</span><span x-text="formatCurrency(calculations.totalWithTaxes)" class="font-medium text-gray-800 dark:text-gray-200">$0.00</span></div>
                             <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-3"><span class="text-gray-600 dark:text-gray-400">Total Deductions</span><span x-text="'-' + formatCurrency(calculations.totalDeductions)" class="font-medium text-red-500 dark:text-red-400">-$0.00</span></div>
                             <div class="flex justify-between items-center text-lg bg-blue-100 dark:bg-blue-900 p-3 rounded-lg mt-3 transition-colors duration-200"><span class="font-semibold text-blue-800 dark:text-blue-200">Amount to be Financed</span><span x-text="formatCurrency(calculations.amountToFinance)" class="font-bold text-blue-800 dark:text-blue-200">$0.00</span></div>
+
+                            <!-- CSV Export Button -->
+                            <div class="mt-4 text-center">
+                                <button @click="exportMainTabToCSV()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 mx-auto">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span>Export to CSV</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -271,10 +380,10 @@
                                             <label :for="'rate-' + rate" class="ml-2 block text-sm text-gray-900 dark:text-gray-100" x-text="rate + '%'"></label>
                                         </div>
                                     </template>
-                                    <div class="flex items-center col-span-2 sm:col-span-4">
+                                    <div class="flex items-center">
                                         <input type="checkbox" x-model="useCustomRate" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
                                         <label class="ml-2 block text-sm text-gray-900 dark:text-gray-100">Custom:</label>
-                                        <input type="number" x-model.number="customRate" step="0.01" x-show="useCustomRate" class="ml-2 w-24 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" placeholder="e.g., 8.25">
+                                        <input type="number" x-model.number="customRate" step="0.01" x-show="useCustomRate" class="ml-2 w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" placeholder="8.25">
                                     </div>
                                 </div>
                             </div>
@@ -361,6 +470,109 @@
             </div>
         </div>
 
+        <div x-show="activeTab === 'compare'">
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">Compare Vehicle Options</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Compare different trims, packages, or options for the same vehicle using your current loan settings.</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button @click="exportCompareTabToCSV()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span>Export CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Current Settings Display -->
+                <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-2 transition-colors duration-200">
+                    <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Using These Loan Settings:</h3>
+                    <div class="text-xs text-gray-600 dark:text-gray-400 grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Interest Rate:</span> <span x-text="interestRate.toFixed(2) + '%'"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Loan Term:</span> <span x-text="loanTerm + ' months'"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Fees:</span> <span x-text="formatCurrency(totalFees)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Trade-In:</span> <span x-text="formatCurrency(tradeIn)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Down Payment:</span> <span x-text="formatCurrency(downPayment)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Incentives:</span> <span x-text="formatCurrency(fedIncentive + provIncentive)"></span></div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Options -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Vehicle Options</h3>
+
+                    <template x-for="(option, index) in compareOptions" :key="index">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-3 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400" x-text="'Option ' + (index + 1)"></span>
+                                <button @click="removeCompareOption(index)" x-show="compareOptions.length > 1" class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors duration-200">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v1M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Trim/Package Name</label>
+                                    <input type="text" x-model="option.name" placeholder="e.g., Base, Premium, Limited" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Price</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                                        <input type="number" x-model.number="option.price" placeholder="e.g., 45000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Results for this option -->
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mt-3 transition-colors duration-200">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                                    <div>
+                                        <span class="text-gray-600 dark:text-gray-400">Monthly Payment:</span>
+                                        <div class="font-semibold text-blue-600 dark:text-blue-400" x-text="formatCurrency(calculateComprehensiveComparison(option.price).monthlyPayment)"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600 dark:text-gray-400">Total Interest:</span>
+                                        <div class="font-semibold text-gray-700 dark:text-gray-300" x-text="formatCurrency(calculateComprehensiveComparison(option.price).totalInterest)"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600 dark:text-gray-400">Total Cost:</span>
+                                        <div class="font-semibold text-gray-700 dark:text-gray-300" x-text="formatCurrency(calculateComprehensiveComparison(option.price).totalCost)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Add Option Button -->
+                    <button @click="addCompareOption()" class="w-full py-3 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Add Another Option</span>
+                    </button>
+                </div>
+
+                <!-- Summary Comparison -->
+                <div x-show="compareOptions.length > 1" class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 transition-colors duration-200">
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Quick Comparison</h3>
+                    <div class="space-y-2">
+                        <template x-for="(option, index) in compareOptions" :key="index">
+                            <div x-show="option.name && option.price > 0" class="flex justify-between items-center text-sm">
+                                <span class="font-medium text-gray-700 dark:text-gray-300" x-text="option.name || ('Option ' + (index + 1))"></span>
+                                <span class="font-semibold text-blue-600 dark:text-blue-400" x-text="formatCurrency(calculateComprehensiveComparison(option.price).monthlyPayment) + '/mo'"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -374,7 +586,7 @@
                 get TOTAL_TAX_RATE() { return this.GST_RATE + this.QST_RATE; },
                 matrixTerms: [12, 24, 36, 48, 60, 72, 84, 96],
                 matrixRates: [3.99, 4.99, 5.99, 6.99, 7.99],
-                
+
                 // State
                 activeTab: 'payment',
                 vehiclePrice: 0,
@@ -391,7 +603,13 @@
                 selectedTerms: [48, 60, 72],
                 useCustomRate: false,
                 customRate: 0,
-                
+
+                // Comparison state
+                compareOptions: [
+                    { name: '', price: 0 },
+                    { name: '', price: 0 }
+                ],
+
                 // Dark mode state
                 darkMode: false,
 
@@ -422,7 +640,7 @@
                         document.documentElement.classList.remove('dark');
                     }
                 },
-                
+
                 // Fee management functions
                 addFee() {
                     this.fees.push({ amount: 0, placeholder: 'e.g., 1500', description: '' });
@@ -436,6 +654,19 @@
                     }
                 },
 
+                // Option management functions
+                addCompareOption() {
+                    this.compareOptions.push({ name: '', price: 0 });
+                    this.saveToStorage();
+                },
+
+                removeCompareOption(index) {
+                    if (this.compareOptions.length > 1) {
+                        this.compareOptions.splice(index, 1);
+                        this.saveToStorage();
+                    }
+                },
+
                 // Helper function to get total fees
                 get totalFees() {
                     return this.fees.reduce((sum, fee) => sum + (this.parseNum(fee.amount) || 0), 0);
@@ -445,29 +676,29 @@
                 parseNum(val) {
                     return parseFloat(val) || 0;
                 },
-                
+
                 formatCurrency(num) {
                     return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(num);
                 },
-                
+
                 formatCurrencyShort(num) {
                     return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(num);
                 },
-                
+
                 calculatePayment(principal, rate, numberOfPayments) {
                     if (principal <= 0) return 0;
                     if (rate === 0 || numberOfPayments === 0) return principal / (numberOfPayments || 1);
                     const factor = Math.pow(1 + rate, numberOfPayments);
                     return principal * (rate * factor) / (factor - 1);
                 },
-                
+
                 calculatePrincipal(monthlyPayment, rate, numberOfPayments) {
                     if (monthlyPayment <= 0) return 0;
                     if (rate === 0) return monthlyPayment * numberOfPayments;
                     const factor = Math.pow(1 + rate, numberOfPayments);
                     return monthlyPayment * (factor - 1) / (rate * factor);
                 },
-                
+
                 // Computed properties
                 get calculations() {
                     const vehiclePrice = this.parseNum(this.vehiclePrice);
@@ -478,7 +709,7 @@
                     const provIncentive = this.parseNum(this.provIncentive);
                     const interestRate = this.parseNum(this.interestRate) / 100;
                     const loanTermMonths = this.parseNum(this.loanTerm);
-                    
+
                     const subtotal = vehiclePrice + fees;
 
                     // Calculate luxury tax using both methods and take the lesser amount
@@ -521,7 +752,7 @@
                     const totalWeeklyPaid = weeklyPayment * weeklyPeriods;
                     const weeklyInterest = totalWeeklyPaid > 0 ? totalWeeklyPaid - amountToFinance : 0;
                     const weeklyCost = totalWeeklyPaid + downPayment + tradeIn;
-                    
+
                     return {
                         subtotal, taxableAmount, gst, qst, luxuryTax, luxuryTaxableAmount, totalWithTaxes, totalDeductions, amountToFinance,
                         monthlyPayment, monthlyInterest, monthlyCost,
@@ -529,7 +760,7 @@
                         weeklyPayment, weeklyInterest, weeklyCost
                     };
                 },
-                
+
                 get budgetResult() {
                     const desiredPayment = this.parseNum(this.desiredPayment);
                     const interestRate = this.parseNum(this.interestRate) / 100;
@@ -612,36 +843,39 @@
                         }
                     }
                 },
-                
+
                 getActiveRates() {
                     const rates = [...this.selectedRates];
-                    if (this.useCustomRate && this.customRate >= 0) {
+                    if (this.useCustomRate && this.customRate >= 0 && !isNaN(this.customRate) && this.customRate !== null && this.customRate !== undefined) {
                         rates.push(this.customRate);
                     }
-                    return rates.sort((a, b) => a - b);
+                    return rates.filter(rate => {
+                        const num = parseFloat(rate);
+                        return !isNaN(num) && isFinite(num);
+                    }).map(rate => parseFloat(rate)).sort((a, b) => a - b);
                 },
-                
+
                 getMatrixCell(term, rate) {
                     const amountToFinance = this.calculations.amountToFinance;
                     const downPayment = this.parseNum(this.downPayment);
                     const tradeIn = this.parseNum(this.tradeIn);
-                    
+
                     if (amountToFinance <= 0) return '';
-                    
+
                     const monthlyRate = (rate / 100) / 12;
                     const payment = this.calculatePayment(amountToFinance, monthlyRate, term);
                     const totalPaid = payment * term;
                     const totalInterest = totalPaid > 0 ? totalPaid - amountToFinance : 0;
                     const totalCost = totalPaid + downPayment + tradeIn;
-                    
+
                     // Calculate min/max for styling
                     const activeRates = this.getActiveRates();
                     const activeTerms = this.selectedTerms.sort((a, b) => a - b);
-                    
+
                     let minPayment = Infinity, maxPayment = -Infinity;
                     let minInterest = Infinity, maxInterest = -Infinity;
                     let minCost = Infinity, maxCost = -Infinity;
-                    
+
                     activeTerms.forEach(t => {
                         activeRates.forEach(r => {
                             const mRate = (r / 100) / 12;
@@ -649,7 +883,7 @@
                             const tPaid = p * t;
                             const tInterest = tPaid > 0 ? tPaid - amountToFinance : 0;
                             const tCost = tPaid + downPayment + tradeIn;
-                            
+
                             minPayment = Math.min(minPayment, p);
                             maxPayment = Math.max(maxPayment, p);
                             minInterest = Math.min(minInterest, tInterest);
@@ -658,7 +892,7 @@
                             maxCost = Math.max(maxCost, tCost);
                         });
                     });
-                    
+
                     let paymentStyle = 'text-gray-800 dark:text-gray-200', interestStyle = '', costStyle = '';
                     if (payment === minPayment) paymentStyle = 'text-green-600 dark:text-green-400 font-bold';
                     if (payment === maxPayment) paymentStyle = 'text-red-600 dark:text-red-400 font-bold';
@@ -677,7 +911,7 @@
                                 <div class="${costStyle}">Cost: ${this.formatCurrencyShort(totalCost)} ${costIcon}</div>
                             </div>`;
                 },
-                
+
                 // Storage functions
                 saveToStorage() {
                     try {
@@ -698,7 +932,7 @@
                         console.error("Could not save data to local storage:", e);
                     }
                 },
-                
+
                 loadFromStorage() {
                     try {
                         const data = localStorage.getItem('quebecCarCalculatorCache');
@@ -728,6 +962,238 @@
                     } catch (e) {
                         console.error("Could not load data from local storage:", e);
                         localStorage.removeItem('quebecCarCalculatorCache');
+                    }
+                },
+
+                // Comparison calculation methods
+                calculateComparisonPayment(price, rate, term) {
+                    if (price <= 0) return 0;
+                    const monthlyRate = rate / 100 / 12;
+                    return this.calculatePayment(price, monthlyRate, term);
+                },
+
+                calculateInterestPaid(price, rate, term) {
+                    const monthlyPayment = this.calculateComparisonPayment(price, rate, term);
+                    const totalPaid = monthlyPayment * term;
+                    return totalPaid > 0 ? totalPaid - price : 0;
+                },
+
+                calculateTotalCost(price, term) {
+                    return price + this.calculateInterestPaid(price, this.interestRate, term);
+                },
+
+                // CSV Export Functions
+                exportMainTabToCSV() {
+                    const calc = this.calculations;
+                    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+                    // Helper function to format numbers for CSV
+                    const formatNumber = (num) => num.toFixed(2);
+
+                    // Create CSV content
+                    let csvContent = "Quebec Car Finance Calculator - Payment Analysis\n";
+                    csvContent += `Generated: ${timestamp}\n\n`;
+
+                    // Input Summary
+                    csvContent += "INPUT SUMMARY\n";
+                    csvContent += "Category,Item,Amount\n";
+                    csvContent += `Purchase,Vehicle Price,$${formatNumber(this.vehiclePrice)}\n`;
+
+                    // Add fees
+                    this.fees.forEach((fee, index) => {
+                        if (fee.amount > 0) {
+                            const description = fee.description || `Fee ${index + 1}`;
+                            csvContent += `Purchase,${description},$${formatNumber(fee.amount)}\n`;
+                        }
+                    });
+
+                    csvContent += `Deductions,Down Payment,$${formatNumber(this.downPayment)}\n`;
+                    csvContent += `Deductions,Trade-In Value,$${formatNumber(this.tradeIn)}\n`;
+                    csvContent += `Deductions,Federal EV Incentive,$${formatNumber(this.fedIncentive)}\n`;
+                    csvContent += `Deductions,Provincial EV Incentive,$${formatNumber(this.provIncentive)}\n`;
+                    csvContent += `Loan Terms,Interest Rate,${this.interestRate}%\n`;
+                    csvContent += `Loan Terms,Loan Term,${this.loanTerm} months\n\n`;
+
+                    // Calculation Breakdown
+                    csvContent += "CALCULATION BREAKDOWN\n";
+                    csvContent += "Item,Amount\n";
+                    csvContent += `Vehicle Price + Fees,$${formatNumber(calc.subtotal)}\n`;
+                    csvContent += `Luxury Tax,$${formatNumber(calc.luxuryTax)}\n`;
+                    csvContent += `Taxable Amount (after Trade-in),$${formatNumber(calc.taxableAmount)}\n`;
+                    csvContent += `GST (5.0%),$${formatNumber(calc.gst)}\n`;
+                    csvContent += `QST (9.975%),$${formatNumber(calc.qst)}\n`;
+                    csvContent += `Total Price with Taxes,$${formatNumber(calc.totalWithTaxes)}\n`;
+                    csvContent += `Total Deductions,$${formatNumber(calc.totalDeductions)}\n`;
+                    csvContent += `Amount to be Financed,$${formatNumber(calc.amountToFinance)}\n\n`;
+
+                    // Payment Schedule
+                    csvContent += "PAYMENT SCHEDULE\n";
+                    csvContent += "Frequency,Payment Amount,Total Interest,Total Cost\n";
+                    csvContent += `Monthly,$${formatNumber(calc.monthlyPayment)},$${formatNumber(calc.monthlyInterest)},$${formatNumber(calc.monthlyCost)}\n`;
+                    csvContent += `Bi-Weekly,$${formatNumber(calc.biweeklyPayment)},$${formatNumber(calc.biweeklyInterest)},$${formatNumber(calc.biweeklyCost)}\n`;
+                    csvContent += `Weekly,$${formatNumber(calc.weeklyPayment)},$${formatNumber(calc.weeklyInterest)},$${formatNumber(calc.weeklyCost)}\n\n`;
+
+                    // Payment Matrix
+                    if (this.selectedTerms.length > 0 && this.getActiveRates().length > 0) {
+                        csvContent += "PAYMENT MATRIX\n";
+
+                        // Header row
+                        csvContent += "Term (months)";
+                        this.getActiveRates().forEach(rate => {
+                            csvContent += `,${rate.toFixed(2)}% Rate`;
+                        });
+                        csvContent += "\n";
+
+                        // Data rows
+                        this.selectedTerms.sort((a, b) => a - b).forEach(term => {
+                            csvContent += `${term}`;
+                            this.getActiveRates().forEach(rate => {
+                                const monthlyRate = (rate / 100) / 12;
+                                const payment = this.calculatePayment(calc.amountToFinance, monthlyRate, term);
+                                csvContent += `,$${formatNumber(payment)}`;
+                            });
+                            csvContent += "\n";
+                        });
+                    }
+
+                    // Download the CSV
+                    this.downloadCSV(csvContent, 'car-payment-calculator.csv');
+                },
+
+                exportCompareTabToCSV() {
+                    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+                    // Helper function to format numbers for CSV
+                    const formatNumber = (num) => num.toFixed(2);
+
+                    // Filter options that have both name and price
+                    const validOptions = this.compareOptions.filter(option =>
+                        option.name && option.name.trim() !== '' && option.price > 0
+                    );
+
+                    if (validOptions.length === 0) {
+                        alert('Please add some vehicle options with names and prices to export.');
+                        return;
+                    }
+
+                    // Create CSV content
+                    let csvContent = "Quebec Car Finance Calculator - Vehicle Options Comparison\n";
+                    csvContent += `Generated: ${timestamp}\n\n`;
+
+                    // Loan Settings
+                    csvContent += "LOAN SETTINGS\n";
+                    csvContent += "Setting,Value\n";
+                    csvContent += `Interest Rate,${this.interestRate}%\n`;
+                    csvContent += `Loan Term,${this.loanTerm} months\n`;
+                    csvContent += `Fees,$${formatNumber(this.totalFees)}\n`;
+                    csvContent += `Trade-In Value,$${formatNumber(this.tradeIn)}\n`;
+                    csvContent += `Down Payment,$${formatNumber(this.downPayment)}\n`;
+                    csvContent += `Total Incentives,$${formatNumber(this.fedIncentive + this.provIncentive)}\n\n`;
+
+                    // Comparison Table
+                    csvContent += "VEHICLE OPTIONS COMPARISON\n";
+                    csvContent += "Option Name,Vehicle Price,Monthly Payment,Total Interest,Total Cost\n";
+
+                    validOptions.forEach(option => {
+                        // Calculate comprehensive values including taxes and fees
+                        const calc = this.calculateComprehensiveComparison(option.price);
+
+                        csvContent += `"${option.name}",$${formatNumber(option.price)},$${formatNumber(calc.monthlyPayment)},$${formatNumber(calc.totalInterest)},$${formatNumber(calc.totalCost)}\n`;
+                    });
+
+                    csvContent += "\n";
+
+                    // Detailed breakdown for each option
+                    csvContent += "DETAILED BREAKDOWN BY OPTION\n";
+                    validOptions.forEach((option, index) => {
+                        const calc = this.calculateComprehensiveComparison(option.price);
+
+                        csvContent += `\n${option.name.toUpperCase()}\n`;
+                        csvContent += "Item,Amount\n";
+                        csvContent += `Vehicle Price,$${formatNumber(option.price)}\n`;
+                        csvContent += `Fees,$${formatNumber(this.totalFees)}\n`;
+                        csvContent += `Subtotal,$${formatNumber(calc.subtotal)}\n`;
+                        csvContent += `Luxury Tax,$${formatNumber(calc.luxuryTax)}\n`;
+                        csvContent += `Taxable Amount,$${formatNumber(calc.taxableAmount)}\n`;
+                        csvContent += `GST (5.0%),$${formatNumber(calc.gst)}\n`;
+                        csvContent += `QST (9.975%),$${formatNumber(calc.qst)}\n`;
+                        csvContent += `Total with Taxes,$${formatNumber(calc.totalWithTaxes)}\n`;
+                        csvContent += `Total Deductions,$${formatNumber(calc.totalDeductions)}\n`;
+                        csvContent += `Amount Financed,$${formatNumber(calc.amountToFinance)}\n`;
+                        csvContent += `Monthly Payment,$${formatNumber(calc.monthlyPayment)}\n`;
+                        csvContent += `Total Payments,$${formatNumber(calc.totalPayments)}\n`;
+                        csvContent += `Total Interest,$${formatNumber(calc.totalInterest)}\n`;
+                        csvContent += `Total Cost of Ownership,$${formatNumber(calc.totalCost)}\n`;
+                    });
+
+                    // Download the CSV
+                    this.downloadCSV(csvContent, 'vehicle-options-comparison.csv');
+                },
+
+                calculateComprehensiveComparison(vehiclePrice) {
+                    // If no vehicle price is entered, return all zeros
+                    if (!vehiclePrice || vehiclePrice <= 0) {
+                        return {
+                            subtotal: 0, luxuryTax: 0, taxableAmount: 0, gst: 0, qst: 0, totalWithTaxes: 0,
+                            totalDeductions: 0, amountToFinance: 0, monthlyPayment: 0, totalPayments: 0,
+                            totalInterest: 0, totalCost: 0
+                        };
+                    }
+
+                    const fees = this.totalFees;
+                    const downPayment = this.parseNum(this.downPayment);
+                    const tradeIn = this.parseNum(this.tradeIn);
+                    const fedIncentive = this.parseNum(this.fedIncentive);
+                    const provIncentive = this.parseNum(this.provIncentive);
+                    const interestRate = this.parseNum(this.interestRate) / 100;
+                    const loanTermMonths = this.parseNum(this.loanTerm);
+
+                    const subtotal = vehiclePrice + fees;
+
+                    // Calculate luxury tax
+                    const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                        subtotal * this.LUXURY_TAX_RATE : 0;
+                    const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
+                    const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
+                    const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                        Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+
+                    // Calculate taxes
+                    const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
+                    const gst = taxableAmount * this.GST_RATE;
+                    const qst = taxableAmount * this.QST_RATE;
+                    const totalWithTaxes = subtotal + luxuryTax + gst + qst;
+                    const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
+                    const amountToFinance = Math.max(0, totalWithTaxes - totalDeductions);
+
+                    // Calculate payments
+                    const monthlyRate = interestRate / 12;
+                    const monthlyPayment = this.calculatePayment(amountToFinance, monthlyRate, loanTermMonths);
+                    const totalPayments = monthlyPayment * loanTermMonths;
+                    const totalInterest = totalPayments > 0 ? totalPayments - amountToFinance : 0;
+                    const totalCost = totalPayments + downPayment + tradeIn;
+
+                    return {
+                        subtotal, luxuryTax, taxableAmount, gst, qst, totalWithTaxes,
+                        totalDeductions, amountToFinance, monthlyPayment, totalPayments,
+                        totalInterest, totalCost
+                    };
+                },
+
+                downloadCSV(content, filename) {
+                    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+
+                    if (link.download !== undefined) {
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', filename);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        alert('Your browser does not support automatic downloads. Please copy the data manually.');
                     }
                 }
             }
