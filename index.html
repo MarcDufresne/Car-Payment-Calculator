@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quebec Car Finance Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -24,6 +29,9 @@
             -webkit-transition: .2s;
             transition: opacity .2s;
         }
+        .dark input[type=range] {
+            background: #475569;
+        }
         input[type=range]:hover {
             opacity: 1;
         }
@@ -42,43 +50,63 @@
             background: #3b82f6;
             cursor: pointer;
             border-radius: 50%;
+            border: none;
         }
         /* Style for placeholder text */
         ::placeholder {
             color: #9ca3af;
             opacity: 1; 
         }
+        .dark ::placeholder {
+            color: #6b7280;
+        }
         .tab-active {
             border-color: #3b82f6;
             color: #3b82f6;
             background-color: #eff6ff;
         }
+        .dark .tab-active {
+            background-color: #1e3a8a;
+            color: #93c5fd;
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-4 sm:p-6 lg:p-8" x-data="carCalculator()">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 sm:p-6 lg:p-8 transition-colors duration-200" x-data="carCalculator()">
 
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-12">
-        
+    <div class="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-gray-900/50 p-6 sm:p-8 mb-12 transition-colors duration-200">
+
         <!-- Header -->
-        <div class="flex items-center justify-start mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 1 1 0 000-2zM2 16a1 1 0 112 0 1 1 0 01-2 0z" clip-rule="evenodd" />
-            </svg>
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Quebec Car Finance Calculator</h1>
-                <p class="text-sm sm:text-base text-gray-500 mt-1">Estimate your payments and total costs with Quebec-specific tax rules.</p>
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 1 1 0 000-2zM2 16a1 1 0 112 0 1 1 0 01-2 0z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Quebec Car Finance Calculator</h1>
+                    <p class="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Estimate your payments and total costs with Quebec-specific tax rules.</p>
+                </div>
             </div>
+
+            <!-- Dark Mode Toggle -->
+            <button @click="toggleDarkMode()" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+                <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                <svg x-show="darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </button>
         </div>
         
         <!-- Tabs -->
-        <div class="mb-6 border-b border-gray-200">
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav class="-mb-px flex space-x-6" aria-label="Tabs">
                 <button @click="activeTab = 'payment'" 
-                        :class="activeTab === 'payment' ? 'tab-active' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                        class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">Payment Calculator</button>
-                <button @click="activeTab = 'budget'" 
-                        :class="activeTab === 'budget' ? 'tab-active' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                        class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">Budget Calculator</button>
+                        :class="activeTab === 'payment' ? 'tab-active' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'"
+                        class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200">Payment Calculator</button>
+                <button @click="activeTab = 'budget'"
+                        :class="activeTab === 'budget' ? 'tab-active' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'"
+                        class="tab-button whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200">Budget Calculator</button>
             </nav>
         </div>
 
@@ -86,149 +114,185 @@
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <!-- Left Side: Inputs -->
                 <div class="lg:col-span-2 space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">1. Your Numbers</h2>
-                    
+                    <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">1. Your Numbers</h2>
+
                     <!-- Input Group: Purchase Details -->
                     <div>
-                        <label for="vehiclePrice" class="block text-sm font-medium text-gray-600 mb-1">Vehicle Price</label>
+                        <label for="vehiclePrice" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Vehicle Price</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="vehiclePrice" placeholder="e.g., 45000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                            <input id="vehiclePrice" type="number" x-model.number="vehiclePrice" placeholder="e.g., 45000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
+
+                    <!-- Input Group: Fees -->
                     <div>
-                        <label for="fees" class="block text-sm font-medium text-gray-600 mb-1">Fees (Freight, PDI, AC Tax, etc.)</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="fees" placeholder="e.g., 2000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Fees (Freight, PDI, AC Tax, etc.)</label>
+                        <div class="space-y-2">
+                            <template x-for="(fee, index) in fees" :key="index">
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex-1">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                                        <input type="number" x-model.number="fee.amount" :placeholder="fee.placeholder" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                    </div>
+                                    <input type="text" x-model="fee.description" placeholder="Description (optional)" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                    <button @click="removeFee(index)" x-show="fees.length > 1" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v1M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                            <button @click="addFee()" class="w-full py-2 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <span>Add Another Fee</span>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Input Group: Deductions -->
-                    <h3 class="text-lg font-semibold text-gray-700 pt-4 border-t">Deductions</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 pt-4 border-t border-gray-200 dark:border-gray-700">Deductions</h3>
                      <div>
-                        <label for="downPayment" class="block text-sm font-medium text-gray-600 mb-1">Down Payment</label>
+                        <label for="downPayment" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Down Payment</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="downPayment" placeholder="e.g., 5000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                            <input id="downPayment" type="number" x-model.number="downPayment" placeholder="e.g., 5000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
                     <div>
-                        <label for="tradeIn" class="block text-sm font-medium text-gray-600 mb-1">Trade-In Value</label>
+                        <label for="tradeIn" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Trade-In Value</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="tradeIn" placeholder="e.g., 10000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                            <input id="tradeIn" type="number" x-model.number="tradeIn" placeholder="e.g., 10000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
                     <div>
-                        <label for="fedIncentive" class="block text-sm font-medium text-gray-600 mb-1">Federal EV Incentive</label>
+                        <label for="fedIncentive" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Federal EV Incentive</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="fedIncentive" placeholder="e.g., 5000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                            <input id="fedIncentive" type="number" x-model.number="fedIncentive" placeholder="e.g., 5000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
                     <div>
-                        <label for="provIncentive" class="block text-sm font-medium text-gray-600 mb-1">Provincial EV Incentive</label>
+                        <label for="provIncentive" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Provincial EV Incentive</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                            <input type="number" x-model.number="provIncentive" placeholder="e.g., 7000" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                            <input id="provIncentive" type="number" x-model.number="provIncentive" placeholder="e.g., 7000" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
 
                     <!-- Input Group: Loan Terms -->
-                    <h3 class="text-lg font-semibold text-gray-700 pt-4 border-t">Loan Details</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 pt-4 border-t border-gray-200 dark:border-gray-700">Loan Details</h3>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label for="interestRate" class="block text-sm font-medium text-gray-600">Interest Rate</label>
-                            <span class="text-sm font-semibold text-blue-600"><input type="number" x-model.number="interestRate" step="0.01" class="w-16 text-right border-0 focus:ring-0 p-0 bg-transparent">%</span>
+                            <label for="interestRate" class="block text-sm font-medium text-gray-600 dark:text-gray-400">Interest Rate</label>
+                            <span class="text-sm font-semibold text-blue-600 dark:text-blue-400"><input type="number" x-model.number="interestRate" step="0.01" class="w-16 text-right border-0 focus:ring-0 p-0 bg-transparent text-blue-600 dark:text-blue-400">%</span>
                         </div>
-                        <input type="range" x-model.number="interestRate" min="0" max="20" step="0.01">
+                        <input id="interestRate" type="range" x-model.number="interestRate" min="0" max="20" step="0.01">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label for="loanTerm" class="block text-sm font-medium text-gray-600">Loan Term</label>
-                            <span class="text-sm font-semibold text-blue-600"><input type="number" x-model.number="loanTerm" step="12" class="w-16 text-right border-0 focus:ring-0 p-0 bg-transparent"> months</span>
+                            <label for="loanTerm" class="block text-sm font-medium text-gray-600 dark:text-gray-400">Loan Term</label>
+                            <span class="text-sm font-semibold text-blue-600 dark:text-blue-400"><input type="number" x-model.number="loanTerm" step="12" class="w-16 text-right border-0 focus:ring-0 p-0 bg-transparent text-blue-600 dark:text-blue-400"> months</span>
                         </div>
-                        <input type="range" x-model.number="loanTerm" min="12" max="96" step="12">
+                        <input id="loanTerm" type="range" x-model.number="loanTerm" min="12" max="96" step="12">
                     </div>
                 </div>
 
                 <!-- Right Side: Results -->
                 <div class="lg:col-span-3">
                     <!-- Payment Schedule -->
-                    <div class="bg-gray-50 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">2. Estimated Payment Schedule</h2>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 transition-colors duration-200">
+                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">2. Estimated Payment Schedule</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                            <div class="bg-white p-4 rounded-lg border border-blue-200">
-                                <p class="text-sm text-gray-500">Monthly</p>
-                                <p x-text="formatCurrency(calculations.monthlyPayment)" class="text-2xl font-bold text-blue-600 my-2">$0.00</p>
-                                <p class="text-xs text-gray-500">Interest: <span x-text="formatCurrency(calculations.monthlyInterest)" class="font-medium text-gray-700">$0.00</span></p>
-                                <p class="text-xs text-gray-500">Cost: <span x-text="formatCurrency(calculations.monthlyCost)" class="font-medium text-gray-700">$0.00</span></p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors duration-200">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Monthly</p>
+                                <p x-text="formatCurrency(calculations.monthlyPayment)" class="text-2xl font-bold text-blue-600 dark:text-blue-400 my-2">$0.00</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Interest: <span x-text="formatCurrency(calculations.monthlyInterest)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Cost: <span x-text="formatCurrency(calculations.monthlyCost)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
                             </div>
-                            <div class="bg-white p-4 rounded-lg border">
-                                <p class="text-sm text-gray-500">Bi-Weekly</p>
-                                <p x-text="formatCurrency(calculations.biweeklyPayment)" class="text-2xl font-bold text-gray-800 my-2">$0.00</p>
-                                <p class="text-xs text-gray-500">Interest: <span x-text="formatCurrency(calculations.biweeklyInterest)" class="font-medium text-gray-700">$0.00</span></p>
-                                <p class="text-xs text-gray-500">Cost: <span x-text="formatCurrency(calculations.biweeklyCost)" class="font-medium text-gray-700">$0.00</span></p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors duration-200">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Bi-Weekly</p>
+                                <p x-text="formatCurrency(calculations.biweeklyPayment)" class="text-2xl font-bold text-gray-800 dark:text-gray-200 my-2">$0.00</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Interest: <span x-text="formatCurrency(calculations.biweeklyInterest)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Cost: <span x-text="formatCurrency(calculations.biweeklyCost)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
                             </div>
-                            <div class="bg-white p-4 rounded-lg border">
-                                <p class="text-sm text-gray-500">Weekly</p>
-                                <p x-text="formatCurrency(calculations.weeklyPayment)" class="text-2xl font-bold text-gray-800 my-2">$0.00</p>
-                                <p class="text-xs text-gray-500">Interest: <span x-text="formatCurrency(calculations.weeklyInterest)" class="font-medium text-gray-700">$0.00</span></p>
-                                <p class="text-xs text-gray-500">Cost: <span x-text="formatCurrency(calculations.weeklyCost)" class="font-medium text-gray-700">$0.00</span></p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors duration-200">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Weekly</p>
+                                <p x-text="formatCurrency(calculations.weeklyPayment)" class="text-2xl font-bold text-gray-800 dark:text-gray-200 my-2">$0.00</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Interest: <span x-text="formatCurrency(calculations.weeklyInterest)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Cost: <span x-text="formatCurrency(calculations.weeklyCost)" class="font-medium text-gray-700 dark:text-gray-300">$0.00</span></p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Calculation Breakdown -->
-                    <div class="bg-gray-50 rounded-xl p-6 mt-8">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">3. Calculation Breakdown</h2>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 mt-8 transition-colors duration-200">
+                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">3. Calculation Breakdown</h2>
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between items-center"><span class="text-gray-600">Vehicle Price + Fees</span><span x-text="formatCurrency(calculations.subtotal)" class="font-medium text-gray-800">$0.00</span></div>
-                            <div class="flex justify-between items-center border-t pt-3"><span class="text-gray-600">Taxable Amount (after Trade-in)</span><span x-text="formatCurrency(calculations.taxableAmount)" class="font-medium text-gray-800">$0.00</span></div>
-                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500">GST (5.0%)</span><span x-text="formatCurrency(calculations.gst)" class="font-medium text-gray-600">$0.00</span></div>
-                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500">QST (9.975%)</span><span x-text="formatCurrency(calculations.qst)" class="font-medium text-gray-600">$0.00</span></div>
-                            <div class="flex justify-between items-center border-t pt-3"><span class="text-gray-600">Total Price with Taxes</span><span x-text="formatCurrency(calculations.totalWithTaxes)" class="font-medium text-gray-800">$0.00</span></div>
-                            <div class="flex justify-between items-center border-t pt-3"><span class="text-gray-600">Total Deductions</span><span x-text="'-' + formatCurrency(calculations.totalDeductions)" class="font-medium text-red-500">-$0.00</span></div>
-                            <div class="flex justify-between items-center text-lg bg-blue-100 p-3 rounded-lg mt-3"><span class="font-semibold text-blue-800">Amount to be Financed</span><span x-text="formatCurrency(calculations.amountToFinance)" class="font-bold text-blue-800">$0.00</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-600 dark:text-gray-400">Vehicle Price + Fees</span><span x-text="formatCurrency(calculations.subtotal)" class="font-medium text-gray-800 dark:text-gray-200">$0.00</span></div>
+                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500 dark:text-gray-400">Vehicle Price</span><span x-text="formatCurrency(vehiclePrice)" class="font-medium text-gray-600 dark:text-gray-300">$0.00</span></div>
+                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500 dark:text-gray-400">Fees (Freight, PDI, AC Tax, etc.)</span><span x-text="formatCurrency(totalFees)" class="font-medium text-gray-600 dark:text-gray-300">$0.00</span></div>
+                            <div class="flex justify-between items-center pl-4">
+                                <div class="text-gray-500 dark:text-gray-400 flex items-center group relative">
+                                    Luxury Tax
+                                    <svg class="w-4 h-4 ml-1 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 dark:bg-gray-900 text-white text-xs rounded py-2 px-3 whitespace-nowrap z-10 shadow-lg">
+                                        Federal luxury tax on vehicles over $100,000<br>
+                                        Lesser of: 10% of full amount OR 20% of amount exceeding $100,000
+                                        <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800 dark:border-t-gray-900"></div>
+                                    </div>
+                                </div>
+                                <span x-text="formatCurrency(calculations.luxuryTax)" class="font-medium text-gray-600 dark:text-gray-300">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-3"><span class="text-gray-600 dark:text-gray-400">Taxable Amount (after Trade-in)</span><span x-text="formatCurrency(calculations.taxableAmount)" class="font-medium text-gray-800 dark:text-gray-200">$0.00</span></div>
+                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500 dark:text-gray-400">GST (5.0%)</span><span x-text="formatCurrency(calculations.gst)" class="font-medium text-gray-600 dark:text-gray-300">$0.00</span></div>
+                            <div class="flex justify-between items-center pl-4"><span class="text-gray-500 dark:text-gray-400">QST (9.975%)</span><span x-text="formatCurrency(calculations.qst)" class="font-medium text-gray-600 dark:text-gray-300">$0.00</span></div>
+                            <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-3"><span class="text-gray-600 dark:text-gray-400">Total Price with Taxes</span><span x-text="formatCurrency(calculations.totalWithTaxes)" class="font-medium text-gray-800 dark:text-gray-200">$0.00</span></div>
+                            <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-3"><span class="text-gray-600 dark:text-gray-400">Total Deductions</span><span x-text="'-' + formatCurrency(calculations.totalDeductions)" class="font-medium text-red-500 dark:text-red-400">-$0.00</span></div>
+                            <div class="flex justify-between items-center text-lg bg-blue-100 dark:bg-blue-900 p-3 rounded-lg mt-3 transition-colors duration-200"><span class="font-semibold text-blue-800 dark:text-blue-200">Amount to be Financed</span><span x-text="formatCurrency(calculations.amountToFinance)" class="font-bold text-blue-800 dark:text-blue-200">$0.00</span></div>
                         </div>
                     </div>
 
                     <!-- Payment Matrix -->
-                    <div class="bg-gray-50 rounded-xl p-6 mt-8">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">4. Payment Matrix</h2>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 mt-8 transition-colors duration-200">
+                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">4. Payment Matrix</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-2">Interest Rates (%)</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Interest Rates (%)</label>
                                 <div class="grid grid-cols-3 sm:grid-cols-4 gap-x-4 gap-y-2">
                                     <template x-for="rate in matrixRates" :key="rate">
                                         <div class="flex items-center">
-                                            <input :id="'rate-' + rate" type="checkbox" :value="rate" x-model="selectedRates" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                            <label :for="'rate-' + rate" class="ml-2 block text-sm text-gray-900" x-text="rate + '%'"></label>
+                                            <input :id="'rate-' + rate" type="checkbox" :value="rate" x-model="selectedRates" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                                            <label :for="'rate-' + rate" class="ml-2 block text-sm text-gray-900 dark:text-gray-100" x-text="rate + '%'"></label>
                                         </div>
                                     </template>
                                     <div class="flex items-center col-span-2 sm:col-span-4">
-                                        <input type="checkbox" x-model="useCustomRate" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <label class="ml-2 block text-sm text-gray-900">Custom:</label>
-                                        <input type="number" x-model.number="customRate" step="0.01" x-show="useCustomRate" class="ml-2 w-24 px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 8.25">
+                                        <input type="checkbox" x-model="useCustomRate" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                                        <label class="ml-2 block text-sm text-gray-900 dark:text-gray-100">Custom:</label>
+                                        <input type="number" x-model.number="customRate" step="0.01" x-show="useCustomRate" class="ml-2 w-24 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" placeholder="e.g., 8.25">
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-2">Loan Terms (Months)</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Loan Terms (Months)</label>
                                 <div class="grid grid-cols-4 gap-x-4 gap-y-2">
                                     <template x-for="term in matrixTerms" :key="term">
                                         <div class="flex items-center">
-                                            <input :id="'term-' + term" type="checkbox" :value="term" x-model="selectedTerms" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                            <label :for="'term-' + term" class="ml-2 block text-sm text-gray-900" x-text="term"></label>
+                                            <input :id="'term-' + term" type="checkbox" :value="term" x-model="selectedTerms" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                                            <label :for="'term-' + term" class="ml-2 block text-sm text-gray-900 dark:text-gray-100" x-text="term"></label>
                                         </div>
                                     </template>
                                 </div>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left text-gray-500">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-200 dark:bg-gray-600">
                                     <tr>
                                         <th scope="col" class="px-4 py-3 rounded-l-lg">Term</th>
                                         <template x-for="(rate, index) in getActiveRates()" :key="rate">
@@ -238,8 +302,8 @@
                                 </thead>
                                 <tbody>
                                     <template x-for="term in selectedTerms.sort((a, b) => a - b)" :key="term">
-                                        <tr class="border-b">
-                                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap" x-text="term + ' mo'"></th>
+                                        <tr class="border-b border-gray-200 dark:border-gray-600">
+                                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap" x-text="term + ' mo'"></th>
                                             <template x-for="rate in getActiveRates()" :key="rate">
                                                 <td class="p-2 text-center" x-html="getMatrixCell(term, rate)"></td>
                                             </template>
@@ -255,43 +319,43 @@
         
         <div x-show="activeTab === 'budget'">
             <div class="max-w-md mx-auto space-y-6">
-                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Budget Calculator</h2>
-                <p class="text-sm text-gray-600">Start with your desired monthly payment to see what you can afford.</p>
-                
-                <div class="bg-gray-50 border rounded-lg p-4 space-y-2">
-                    <h3 class="text-sm font-semibold text-gray-800">Using These Values (from main tab):</h3>
-                    <div class="text-xs text-gray-600 grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div><span class="font-medium text-gray-900">Fees:</span> <span x-text="formatCurrency(fees)"></span></div>
-                        <div><span class="font-medium text-gray-900">Trade-In:</span> <span x-text="formatCurrency(tradeIn)"></span></div>
-                        <div><span class="font-medium text-gray-900">Incentives:</span> <span x-text="formatCurrency(fedIncentive + provIncentive)"></span></div>
-                        <div><span class="font-medium text-gray-900">Interest Rate:</span> <span x-text="interestRate.toFixed(2) + '%'"></span></div>
-                        <div><span class="font-medium text-gray-900">Loan Term:</span> <span x-text="loanTerm + ' months'"></span></div>
-                        <div x-show="reverseMode === 'maxPrice'"><span class="font-medium text-gray-900">Down Payment:</span> <span x-text="formatCurrency(downPayment)"></span></div>
-                        <div x-show="reverseMode === 'minDP'"><span class="font-medium text-gray-900">Vehicle Price:</span> <span x-text="formatCurrency(vehiclePrice)"></span></div>
+                <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">Budget Calculator</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Start with your desired monthly payment to see what you can afford.</p>
+
+                <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-2 transition-colors duration-200">
+                    <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Using These Values (from main tab):</h3>
+                    <div class="text-xs text-gray-600 dark:text-gray-400 grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Fees:</span> <span x-text="formatCurrency(totalFees)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Trade-In:</span> <span x-text="formatCurrency(tradeIn)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Incentives:</span> <span x-text="formatCurrency(fedIncentive + provIncentive)"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Interest Rate:</span> <span x-text="interestRate.toFixed(2) + '%'"></span></div>
+                        <div><span class="font-medium text-gray-900 dark:text-gray-100">Loan Term:</span> <span x-text="loanTerm + ' months'"></span></div>
+                        <div x-show="reverseMode === 'maxPrice'"><span class="font-medium text-gray-900 dark:text-gray-100">Down Payment:</span> <span x-text="formatCurrency(downPayment)"></span></div>
+                        <div x-show="reverseMode === 'minDP'"><span class="font-medium text-gray-900 dark:text-gray-100">Vehicle Price:</span> <span x-text="formatCurrency(vehiclePrice)"></span></div>
                     </div>
                 </div>
 
                 <div>
-                    <label for="desiredPayment" class="block text-sm font-medium text-gray-600 mb-1">Desired Monthly Payment</label>
+                    <label for="desiredPayment" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Desired Monthly Payment</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
-                        <input type="number" x-model.number="desiredPayment" placeholder="e.g., 500" class="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                        <input id="desiredPayment" type="number" x-model.number="desiredPayment" placeholder="e.g., 500" class="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                     </div>
                 </div>
                 <div class="space-y-2">
-                     <label class="block text-sm font-medium text-gray-600">Calculation Mode</label>
+                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">Calculation Mode</label>
                      <div class="flex space-x-4">
                         <div class="flex items-center">
-                            <input x-model="reverseMode" value="maxPrice" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label class="ml-2 block text-sm text-gray-900">Find Max Vehicle Price</label>
+                            <input id="maxPrice" x-model="reverseMode" value="maxPrice" type="radio" class="h-4 w-4 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                            <label for="maxPrice" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">Find Max Vehicle Price</label>
                         </div>
                         <div class="flex items-center">
-                            <input x-model="reverseMode" value="minDP" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label class="ml-2 block text-sm text-gray-900">Find Min Down Payment</label>
+                            <input id="minDP" x-model="reverseMode" value="minDP" type="radio" class="h-4 w-4 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                            <label for="minDP" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">Find Min Down Payment</label>
                         </div>
                      </div>
                 </div>
-                <div x-html="budgetResult" class="bg-blue-50 p-4 rounded-lg text-center">
+                <div x-html="budgetResult" class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center transition-colors duration-200">
                    <!-- Result will be injected here -->
                 </div>
             </div>
@@ -305,6 +369,8 @@
                 // Constants
                 GST_RATE: 0.05,
                 QST_RATE: 0.09975,
+                LUXURY_TAX_RATE: 0.10,
+                LUXURY_TAX_THRESHOLD: 100000,
                 get TOTAL_TAX_RATE() { return this.GST_RATE + this.QST_RATE; },
                 matrixTerms: [12, 24, 36, 48, 60, 72, 84, 96],
                 matrixRates: [3.99, 4.99, 5.99, 6.99, 7.99],
@@ -312,7 +378,7 @@
                 // State
                 activeTab: 'payment',
                 vehiclePrice: 0,
-                fees: 0,
+                fees: [{ amount: 0, placeholder: 'e.g., 2000', description: '' }],
                 downPayment: 0,
                 tradeIn: 0,
                 fedIncentive: 0,
@@ -326,12 +392,55 @@
                 useCustomRate: false,
                 customRate: 0,
                 
+                // Dark mode state
+                darkMode: false,
+
                 init() {
                     this.loadFromStorage();
-                    // Note: $watch is not needed with our simple reactive system
-                    // Changes will trigger updates automatically through event listeners
+                    this.initDarkMode();
+                },
+
+                initDarkMode() {
+                    // Check for saved theme preference or default to light mode
+                    const savedTheme = localStorage.getItem('theme');
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                    this.darkMode = savedTheme === 'dark' || (!savedTheme && prefersDark);
+                    this.updateDarkMode();
+                },
+
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                    this.updateDarkMode();
+                    localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+                },
+
+                updateDarkMode() {
+                    if (this.darkMode) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
                 },
                 
+                // Fee management functions
+                addFee() {
+                    this.fees.push({ amount: 0, placeholder: 'e.g., 1500', description: '' });
+                    this.saveToStorage();
+                },
+
+                removeFee(index) {
+                    if (this.fees.length > 1) {
+                        this.fees.splice(index, 1);
+                        this.saveToStorage();
+                    }
+                },
+
+                // Helper function to get total fees
+                get totalFees() {
+                    return this.fees.reduce((sum, fee) => sum + (this.parseNum(fee.amount) || 0), 0);
+                },
+
                 // Helper functions
                 parseNum(val) {
                     return parseFloat(val) || 0;
@@ -362,7 +471,7 @@
                 // Computed properties
                 get calculations() {
                     const vehiclePrice = this.parseNum(this.vehiclePrice);
-                    const fees = this.parseNum(this.fees);
+                    const fees = this.parseNum(this.fees.reduce((sum, fee) => sum + fee.amount, 0));
                     const downPayment = this.parseNum(this.downPayment);
                     const tradeIn = this.parseNum(this.tradeIn);
                     const fedIncentive = this.parseNum(this.fedIncentive);
@@ -371,10 +480,25 @@
                     const loanTermMonths = this.parseNum(this.loanTerm);
                     
                     const subtotal = vehiclePrice + fees;
-                    const taxableAmount = Math.max(0, subtotal - tradeIn);
+
+                    // Calculate luxury tax using both methods and take the lesser amount
+                    // Method 1: 10% of the full amount (vehicle price + fees)
+                    const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                        subtotal * this.LUXURY_TAX_RATE : 0;
+
+                    // Method 2: 20% of the amount exceeding $100,000
+                    const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
+                    const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
+
+                    // Apply the lesser of the two methods
+                    const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                        Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+
+                    // Calculate taxable amount including luxury tax (luxury tax is taxable)
+                    const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
                     const gst = taxableAmount * this.GST_RATE;
                     const qst = taxableAmount * this.QST_RATE;
-                    const totalWithTaxes = subtotal + gst + qst;
+                    const totalWithTaxes = subtotal + luxuryTax + gst + qst;
                     const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
                     const amountToFinance = Math.max(0, totalWithTaxes - totalDeductions);
 
@@ -399,7 +523,7 @@
                     const weeklyCost = totalWeeklyPaid + downPayment + tradeIn;
                     
                     return {
-                        subtotal, taxableAmount, gst, qst, totalWithTaxes, totalDeductions, amountToFinance,
+                        subtotal, taxableAmount, gst, qst, luxuryTax, luxuryTaxableAmount, totalWithTaxes, totalDeductions, amountToFinance,
                         monthlyPayment, monthlyInterest, monthlyCost,
                         biweeklyPayment, biweeklyInterest, biweeklyCost,
                         weeklyPayment, weeklyInterest, weeklyCost
@@ -412,7 +536,7 @@
                     const loanTermMonths = this.parseNum(this.loanTerm);
                     const monthlyRate = interestRate / 12;
 
-                    const fees = this.parseNum(this.fees);
+                    const fees = this.parseNum(this.fees.reduce((sum, fee) => sum + fee.amount, 0));
                     const tradeIn = this.parseNum(this.tradeIn);
                     const fedIncentive = this.parseNum(this.fedIncentive);
                     const provIncentive = this.parseNum(this.provIncentive);
@@ -424,23 +548,67 @@
                         if (maxFinanced > 0) {
                             const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
                             const totalValue = maxFinanced + totalDeductions;
-                            const subtotal = (totalValue + tradeIn * this.TOTAL_TAX_RATE) / (1 + this.TOTAL_TAX_RATE);
-                            const maxPrice = subtotal - fees;
-                            return `<p class="text-sm text-gray-700">Max. Affordable Vehicle Price:</p><p class="text-2xl font-bold text-blue-600">${this.formatCurrency(Math.max(0, maxPrice))}</p>`;
+
+                            // We need to solve for the vehicle price including luxury tax
+                            // Let's use an iterative approach since the luxury tax depends on the subtotal
+                            let estimatedPrice = fees > 0 ? 0 : 50000; // Start with a reasonable estimate
+                            let iterations = 0;
+                            const maxIterations = 100;
+
+                            while (iterations < maxIterations) {
+                                const subtotal = estimatedPrice + fees;
+
+                                // Calculate luxury tax using both methods and take the lesser amount
+                                const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                                    subtotal * this.LUXURY_TAX_RATE : 0;
+                                const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
+                                const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
+                                const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                                    Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+
+                                // Calculate taxable amount including luxury tax (luxury tax is taxable)
+                                const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
+                                const regularTaxes = taxableAmount * this.TOTAL_TAX_RATE;
+                                const calculatedTotal = subtotal + luxuryTax + regularTaxes;
+
+                                const diff = Math.abs(calculatedTotal - totalValue);
+                                if (diff < 1) break; // Close enough
+
+                                // Adjust estimate
+                                if (calculatedTotal > totalValue) {
+                                    estimatedPrice -= Math.max(1, (calculatedTotal - totalValue) * 0.8);
+                                } else {
+                                    estimatedPrice += Math.max(1, (totalValue - calculatedTotal) * 0.8);
+                                }
+
+                                iterations++;
+                            }
+
+                            return `<p class="text-sm text-gray-700 dark:text-gray-300">Max. Affordable Vehicle Price:</p><p class="text-2xl font-bold text-blue-600 dark:text-blue-200">${this.formatCurrency(Math.max(0, estimatedPrice))}</p>`;
                         } else {
-                            return `<p class="text-sm text-gray-700">Enter a desired payment.</p>`;
+                            return `<p class="text-sm text-gray-700 dark:text-gray-300">Enter a desired payment.</p>`;
                         }
                     } else {
                         if (vehiclePrice > 0) {
                             const subtotal = vehiclePrice + fees;
-                            const taxableAmount = Math.max(0, subtotal - tradeIn);
-                            const totalWithTaxes = subtotal + (taxableAmount * this.TOTAL_TAX_RATE);
+
+                            // Calculate luxury tax using both methods and take the lesser amount
+                            const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                                subtotal * this.LUXURY_TAX_RATE : 0;
+                            const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
+                            const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
+                            const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
+                                Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+
+                            // Calculate taxable amount including luxury tax (luxury tax is taxable)
+                            const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
+                            const totalWithTaxes = subtotal + luxuryTax + (taxableAmount * this.TOTAL_TAX_RATE);
                             const requiredFinanced = this.calculatePrincipal(desiredPayment, monthlyRate, loanTermMonths);
                             const requiredTotalDeductions = totalWithTaxes - requiredFinanced;
                             const minDownPayment = requiredTotalDeductions - (tradeIn + fedIncentive + provIncentive);
-                            return `<p class="text-sm text-gray-700">Min. Required Down Payment:</p><p class="text-2xl font-bold text-blue-600">${this.formatCurrency(Math.max(0, minDownPayment))}</p>`;
+                            return `<p class="text-sm text-gray-700 dark:text-gray-300">Min. Required Down Payment:</p><p class="text-2xl font-bold text-blue-600 dark:text-blue-200">${this.formatCurrency(Math.max(0, minDownPayment))}</p>`;
                         } else {
-                            return `<p class="text-sm text-gray-700">Enter a vehicle price on the main tab.</p>`;
+                            return `<p class="text-sm text-gray-700 dark:text-gray-300">Enter a vehicle price on the main tab.</p>`;
                         }
                     }
                 },
@@ -491,20 +659,20 @@
                         });
                     });
                     
-                    let paymentStyle = '', interestStyle = '', costStyle = '';
-                    if (payment === minPayment) paymentStyle = 'text-green-600 font-bold';
-                    if (payment === maxPayment) paymentStyle = 'text-red-600 font-bold';
-                    if (totalInterest === minInterest) interestStyle = 'text-green-600 font-bold';
-                    if (totalInterest === maxInterest) interestStyle = 'text-red-600 font-bold';
-                    if (totalCost === minCost) costStyle = 'text-green-600 font-bold';
-                    if (totalCost === maxCost) costStyle = 'text-red-600 font-bold';
+                    let paymentStyle = 'text-gray-800 dark:text-gray-200', interestStyle = '', costStyle = '';
+                    if (payment === minPayment) paymentStyle = 'text-green-600 dark:text-green-400 font-bold';
+                    if (payment === maxPayment) paymentStyle = 'text-red-600 dark:text-red-400 font-bold';
+                    if (totalInterest === minInterest) interestStyle = 'text-green-600 dark:text-green-400 font-bold';
+                    if (totalInterest === maxInterest) interestStyle = 'text-red-600 dark:text-red-400 font-bold';
+                    if (totalCost === minCost) costStyle = 'text-green-600 dark:text-green-400 font-bold';
+                    if (totalCost === maxCost) costStyle = 'text-red-600 dark:text-red-400 font-bold';
 
                     const paymentIcon = payment === minPayment ? '<span class="text-green-500">▼</span>' : payment === maxPayment ? '<span class="text-red-500">▲</span>' : '';
                     const interestIcon = totalInterest === minInterest ? '<span class="text-green-500">▼</span>' : totalInterest === maxInterest ? '<span class="text-red-500">▲</span>' : '';
                     const costIcon = totalCost === minCost ? '<span class="text-green-500">▼</span>' : totalCost === maxCost ? '<span class="text-red-500">▲</span>' : '';
 
-                    return `<div class="font-semibold text-gray-800 ${paymentStyle}">${this.formatCurrency(payment)} ${paymentIcon}</div>
-                            <div class="text-xs text-gray-500 mt-1">
+                    return `<div class="font-semibold ${paymentStyle}">${this.formatCurrency(payment)} ${paymentIcon}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 <div class="${interestStyle}">Int: ${this.formatCurrencyShort(totalInterest)} ${interestIcon}</div>
                                 <div class="${costStyle}">Cost: ${this.formatCurrencyShort(totalCost)} ${costIcon}</div>
                             </div>`;
@@ -537,7 +705,17 @@
                         if (data) {
                             const parsed = JSON.parse(data);
                             this.vehiclePrice = parsed.vehiclePrice || 0;
-                            this.fees = parsed.fees || 0;
+
+                            // Handle both old and new fee structures
+                            if (Array.isArray(parsed.fees)) {
+                                this.fees = parsed.fees;
+                            } else if (typeof parsed.fees === 'number') {
+                                // Convert old single fee to new array structure
+                                this.fees = [{ amount: parsed.fees || 0, placeholder: 'e.g., 2000', description: '' }];
+                            } else {
+                                this.fees = [{ amount: 0, placeholder: 'e.g., 2000', description: '' }];
+                            }
+
                             this.downPayment = parsed.downPayment || 0;
                             this.tradeIn = parsed.tradeIn || 0;
                             this.fedIncentive = parsed.fedIncentive || 0;
