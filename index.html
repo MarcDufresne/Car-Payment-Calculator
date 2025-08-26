@@ -685,18 +685,69 @@
                     return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(num);
                 },
 
-                calculatePayment(principal, rate, numberOfPayments) {
-                    if (principal <= 0) return 0;
-                    if (rate === 0 || numberOfPayments === 0) return principal / (numberOfPayments || 1);
-                    const factor = Math.pow(1 + rate, numberOfPayments);
-                    return principal * (rate * factor) / (factor - 1);
+                // Centralized luxury tax calculation
+                calculateLuxuryTax(subtotal) {
+                    if (subtotal <= this.LUXURY_TAX_THRESHOLD) {
+                        return 0;
+                    }
+
+                    // Method 1: 10% of the full amount (vehicle price + fees)
+                    const luxuryTaxMethod1 = subtotal * this.LUXURY_TAX_RATE;
+
+                    // Method 2: 20% of the amount exceeding $100,000
+                    const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
+                    const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
+
+                    // Return the lesser of the two methods
+                    return Math.min(luxuryTaxMethod1, luxuryTaxMethod2);
                 },
 
-                calculatePrincipal(monthlyPayment, rate, numberOfPayments) {
-                    if (monthlyPayment <= 0) return 0;
-                    if (rate === 0) return monthlyPayment * numberOfPayments;
-                    const factor = Math.pow(1 + rate, numberOfPayments);
-                    return monthlyPayment * (factor - 1) / (rate * factor);
+                // Centralized tax calculation helper
+                calculateTaxes(subtotal, luxuryTax, tradeIn) {
+                    const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
+                    const gst = taxableAmount * this.GST_RATE;
+                    const qst = taxableAmount * this.QST_RATE;
+
+                    return {
+                        taxableAmount,
+                        gst,
+                        qst,
+                        totalTaxes: gst + qst
+                    };
+                },
+
+                // Centralized comprehensive calculation
+                calculateComprehensiveDetails(vehiclePrice) {
+                    if (!vehiclePrice || vehiclePrice <= 0) {
+                        return {
+                            subtotal: 0, luxuryTax: 0, taxableAmount: 0, gst: 0, qst: 0, totalWithTaxes: 0,
+                            totalDeductions: 0, amountToFinance: 0
+                        };
+                    }
+
+                    const fees = this.totalFees;
+                    const downPayment = this.parseNum(this.downPayment);
+                    const tradeIn = this.parseNum(this.tradeIn);
+                    const fedIncentive = this.parseNum(this.fedIncentive);
+                    const provIncentive = this.parseNum(this.provIncentive);
+
+                    const subtotal = vehiclePrice + fees;
+                    const luxuryTax = this.calculateLuxuryTax(subtotal);
+                    const taxes = this.calculateTaxes(subtotal, luxuryTax, tradeIn);
+                    const totalWithTaxes = subtotal + luxuryTax + taxes.totalTaxes;
+                    const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
+                    const amountToFinance = Math.max(0, totalWithTaxes - totalDeductions);
+
+                    return {
+                        subtotal,
+                        luxuryTax,
+                        taxableAmount: taxes.taxableAmount,
+                        gst: taxes.gst,
+                        qst: taxes.qst,
+                        totalWithTaxes,
+                        totalDeductions,
+                        amountToFinance
+                    };
                 },
 
                 // Computed properties
@@ -713,23 +764,11 @@
                     const subtotal = vehiclePrice + fees;
 
                     // Calculate luxury tax using both methods and take the lesser amount
-                    // Method 1: 10% of the full amount (vehicle price + fees)
-                    const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                        subtotal * this.LUXURY_TAX_RATE : 0;
-
-                    // Method 2: 20% of the amount exceeding $100,000
-                    const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
-                    const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
-
-                    // Apply the lesser of the two methods
-                    const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                        Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+                    const luxuryTax = this.calculateLuxuryTax(subtotal);
 
                     // Calculate taxable amount including luxury tax (luxury tax is taxable)
-                    const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
-                    const gst = taxableAmount * this.GST_RATE;
-                    const qst = taxableAmount * this.QST_RATE;
-                    const totalWithTaxes = subtotal + luxuryTax + gst + qst;
+                    const taxes = this.calculateTaxes(subtotal, luxuryTax, tradeIn);
+                    const totalWithTaxes = subtotal + luxuryTax + taxes.totalTaxes;
                     const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
                     const amountToFinance = Math.max(0, totalWithTaxes - totalDeductions);
 
@@ -754,7 +793,7 @@
                     const weeklyCost = totalWeeklyPaid + downPayment + tradeIn;
 
                     return {
-                        subtotal, taxableAmount, gst, qst, luxuryTax, luxuryTaxableAmount, totalWithTaxes, totalDeductions, amountToFinance,
+                        subtotal, taxableAmount: taxes.taxableAmount, gst: taxes.gst, qst: taxes.qst, luxuryTax, totalWithTaxes, totalDeductions, amountToFinance,
                         monthlyPayment, monthlyInterest, monthlyCost,
                         biweeklyPayment, biweeklyInterest, biweeklyCost,
                         weeklyPayment, weeklyInterest, weeklyCost
@@ -790,12 +829,7 @@
                                 const subtotal = estimatedPrice + fees;
 
                                 // Calculate luxury tax using both methods and take the lesser amount
-                                const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                                    subtotal * this.LUXURY_TAX_RATE : 0;
-                                const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
-                                const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
-                                const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                                    Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+                                const luxuryTax = this.calculateLuxuryTax(subtotal);
 
                                 // Calculate taxable amount including luxury tax (luxury tax is taxable)
                                 const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
@@ -824,12 +858,7 @@
                             const subtotal = vehiclePrice + fees;
 
                             // Calculate luxury tax using both methods and take the lesser amount
-                            const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                                subtotal * this.LUXURY_TAX_RATE : 0;
-                            const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
-                            const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
-                            const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                                Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
+                            const luxuryTax = this.calculateLuxuryTax(subtotal);
 
                             // Calculate taxable amount including luxury tax (luxury tax is taxable)
                             const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
@@ -1149,24 +1178,12 @@
                     const loanTermMonths = this.parseNum(this.loanTerm);
 
                     const subtotal = vehiclePrice + fees;
-
-                    // Calculate luxury tax
-                    const luxuryTaxMethod1 = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                        subtotal * this.LUXURY_TAX_RATE : 0;
-                    const luxuryTaxableAmount = Math.max(0, subtotal - this.LUXURY_TAX_THRESHOLD);
-                    const luxuryTaxMethod2 = luxuryTaxableAmount * 0.20;
-                    const luxuryTax = subtotal > this.LUXURY_TAX_THRESHOLD ?
-                        Math.min(luxuryTaxMethod1, luxuryTaxMethod2) : 0;
-
-                    // Calculate taxes
-                    const taxableAmount = Math.max(0, (subtotal + luxuryTax) - tradeIn);
-                    const gst = taxableAmount * this.GST_RATE;
-                    const qst = taxableAmount * this.QST_RATE;
-                    const totalWithTaxes = subtotal + luxuryTax + gst + qst;
+                    const luxuryTax = this.calculateLuxuryTax(subtotal);
+                    const taxes = this.calculateTaxes(subtotal, luxuryTax, tradeIn);
+                    const totalWithTaxes = subtotal + luxuryTax + taxes.totalTaxes;
                     const totalDeductions = downPayment + tradeIn + fedIncentive + provIncentive;
                     const amountToFinance = Math.max(0, totalWithTaxes - totalDeductions);
 
-                    // Calculate payments
                     const monthlyRate = interestRate / 12;
                     const monthlyPayment = this.calculatePayment(amountToFinance, monthlyRate, loanTermMonths);
                     const totalPayments = monthlyPayment * loanTermMonths;
@@ -1174,10 +1191,24 @@
                     const totalCost = totalPayments + downPayment + tradeIn;
 
                     return {
-                        subtotal, luxuryTax, taxableAmount, gst, qst, totalWithTaxes,
+                        subtotal, luxuryTax, taxableAmount: taxes.taxableAmount, gst: taxes.gst, qst: taxes.qst, totalWithTaxes,
                         totalDeductions, amountToFinance, monthlyPayment, totalPayments,
                         totalInterest, totalCost
                     };
+                },
+
+                calculatePayment(principal, rate, numberOfPayments) {
+                    if (principal <= 0) return 0;
+                    if (rate === 0 || numberOfPayments === 0) return principal / (numberOfPayments || 1);
+                    const factor = Math.pow(1 + rate, numberOfPayments);
+                    return principal * (rate * factor) / (factor - 1);
+                },
+
+                calculatePrincipal(monthlyPayment, rate, numberOfPayments) {
+                    if (monthlyPayment <= 0) return 0;
+                    if (rate === 0) return monthlyPayment * numberOfPayments;
+                    const factor = Math.pow(1 + rate, numberOfPayments);
+                    return monthlyPayment * (factor - 1) / (rate * factor);
                 },
 
                 downloadCSV(content, filename) {
