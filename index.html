@@ -615,7 +615,7 @@
                 
                 getActiveRates() {
                     const rates = [...this.selectedRates];
-                    if (this.useCustomRate && this.customRate > 0) {
+                    if (this.useCustomRate && this.customRate >= 0) {
                         rates.push(this.customRate);
                     }
                     return rates.sort((a, b) => a - b);
