@@ -222,6 +222,20 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Vehicle Condition</label>
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center text-sm text-gray-700 dark:text-gray-200">
+                                <input id="condition-new" type="radio" x-model="vehicleCondition" value="new" class="h-4 w-4 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2">New</span>
+                            </label>
+                            <label class="flex items-center text-sm text-gray-700 dark:text-gray-200">
+                                <input id="condition-used" type="radio" x-model="vehicleCondition" value="used" class="h-4 w-4 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2">Used</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Input Group: Fees -->
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Fees (Freight, PDI, AC Tax, etc.)</label>
@@ -342,7 +356,8 @@
                                     </svg>
                                     <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 dark:bg-gray-900 text-white text-xs rounded py-2 px-3 whitespace-nowrap z-10 shadow-lg">
                                         Federal luxury tax on vehicles over $100,000<br>
-                                        Lesser of: 10% of full amount OR 20% of amount exceeding $100,000
+                                        Lesser of: 10% of full amount OR 20% of amount exceeding $100,000<br>
+                                        Used vehicles are exempt
                                         <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800 dark:border-t-gray-900"></div>
                                     </div>
                                 </div>
@@ -590,6 +605,7 @@
                 // State
                 activeTab: 'payment',
                 vehiclePrice: 0,
+                vehicleCondition: 'new',
                 fees: [{ amount: 0, placeholder: 'e.g., 2000', description: '' }],
                 downPayment: 0,
                 tradeIn: 0,
@@ -687,6 +703,9 @@
 
                 // Centralized luxury tax calculation
                 calculateLuxuryTax(subtotal) {
+                    if (this.vehicleCondition === 'used') {
+                        return 0;
+                    }
                     if (subtotal <= this.LUXURY_TAX_THRESHOLD) {
                         return 0;
                     }
@@ -946,6 +965,7 @@
                     try {
                         const data = {
                             vehiclePrice: this.vehiclePrice,
+                            vehicleCondition: this.vehicleCondition,
                             fees: this.fees,
                             downPayment: this.downPayment,
                             tradeIn: this.tradeIn,
@@ -968,6 +988,7 @@
                         if (data) {
                             const parsed = JSON.parse(data);
                             this.vehiclePrice = parsed.vehiclePrice || 0;
+                            this.vehicleCondition = parsed.vehicleCondition === 'used' ? 'used' : 'new';
 
                             // Handle both old and new fee structures
                             if (Array.isArray(parsed.fees)) {
